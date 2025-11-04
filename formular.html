@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>SBB Fahrplan Formular</title>
+  <link rel="stylesheet" href="formular-css.css">
+</head>
+<body>
+
+  <h2>🧭 SBB Fahrplan</h2>
+
+  <form id="fahrplanForm">
+    <!-- Schritt 1 -->
+    <div class="step" id="step1">
+      <label for="from">Von:</label>
+      <input type="text" id="from" name="from" required aria-describedby="fromError" autocomplete="off">
+      <div id="fromSuggestions" class="suggestions"></div>
+      <span id="fromError" class="error">Bitte geben Sie einen gültigen Ort ein.</span>
+
+      <label for="to">Nach:</label>
+      <input type="text" id="to" name="to" required aria-describedby="toError" autocomplete="off">
+      <div id="toSuggestions" class="suggestions"></div>
+      <span id="toError" class="error">Bitte geben Sie einen gültigen Zielort ein.</span>
+
+      <button type="button" id="nextBtn">Weiter</button>
+    </div>
+
+    <!-- Schritt 2 -->
+    <div class="step hidden" id="step2">
+      <label for="date">Abfahrtsdatum:</label>
+      <input type="date" id="date" name="date" required aria-describedby="dateError">
+      <span id="dateError" class="error">Bitte wählen Sie ein gültiges Datum.</span>
+
+      <label for="time">Abfahrtszeit:</label>
+      <input type="time" id="time" name="time" required aria-describedby="timeError">
+      <span id="timeError" class="error">Bitte geben Sie eine gültige Zeit ein.</span>
+
+      <button type="submit">Fahrplan suchen</button>
+    </div>
+  </form>
+
+  <!-- Ergebnisse -->
+  <div id="results" class="hidden">
+    <h3>Verbindungen</h3>
+    <ul id="connections"></ul>
+  </div>
+
+  <script src="formular-js.js"></script>
+</body>
+</html>
