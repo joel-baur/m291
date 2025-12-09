@@ -1,86 +1,274 @@
+/* --- Global --- */
 body {
-  font-family: sans-serif;
-  max-width: 600px;
-  margin: 40px auto;
-  background: #f6f6f6;
-  padding: 20px;
-  border-radius: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: white;
 }
 
-h2, h3 {
-  text-align: center;
-}
-
-label {
-  display: block;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1em;
-}
-
-button {
-  background-color: #0078d4;
-  color: white;
-  border: none;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-button:hover {
-  background-color: #005fa3;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 0.9em;
-  display: none;
-}
-
+/* --- Hidden --- */
 .hidden {
   display: none;
 }
 
-.step, #results {
-  background: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  margin-top: 10px;
+/* --- Header --- */
+.sbb-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  padding: 30px 20px 10px;
 }
 
-#connections {
-  list-style: none;
-  padding: 0;
+.sbb-logo {
+  height: auto;
+  width: 20%;
 }
 
-#connections li {
-  background: #eef4ff;
+.sbb-header h1 {
+  font-size: 230%;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Rote Linie */
+.sbb-redline {
+  height: 6px;
+  background: #e60000;
+  width: 100%;
+}
+
+/* --- KARUSSELL --- */
+.carousel {
+  width: 100%;
+  overflow: hidden;
+  background: rgb(255, 255, 255);
+  position: relative;
+  padding-top: 30px;
+  padding-bottom: 0px;
+  color: white;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); /* horizontal, vertikal, Weichzeichner, Farbe */
+}
+
+.carousel-track-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-item {
+  min-width: 100%;
+  padding: 50px 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.carousel-item:nth-child(1),
+.carousel-item:nth-child(2),
+.carousel-item:nth-child(3) {
+  border-radius: 12px;
+
+  background: radial-gradient(
+    circle,
+    #010ec2 0%,     /* hell in der Mitte */
+    #000987 100%,    /* dunkel außen */
+    #000987 100%
+  );
+}
+
+
+
+/* Pfeile */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  color: #e60;
+  font-size: 30px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+.carousel-btn.left {
+  left: 20px;
+}
+
+.carousel-btn.right {
+  right: 20px;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+
+  /* WICHTIG: Pfeile immer über allem anzeigen */
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+.carousel-btn.left {
+  left: 10px;
+}
+
+.carousel-btn.right {
+  right: 10px;
+}
+
+
+/* Loader & rest bleibt identisch wie bisher */
+.loader {
+  border: 6px solid #ccc;
+  border-top: 6px solid #e60000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin: 20px auto;
+  animation: spin 1s linear infinite;
+}
+
+
+/* --- Container --- */
+.fahrplan-container {
+  max-width: 50%;
+  margin: 40px 26%;
+}
+
+/* --- Grid Layout (2 Spalten) --- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 35px;
+  color: #5c5958;
+  font-size: 20px;
+}
+
+/* --- Inputs --- */
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 25px;
+}
+
+input {
+  padding: 14px;
+  font-size: 20px;
+  border: 2px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
-  margin: 8px 0;
+  width: 100%;
 }
 
-/* Vorschlagsliste */
-.suggestions {
+/* Validierung */
+input.valid { border-color: #009900; }
+input.invalid { border-color: #d00000; }
+
+.error {
+  color: #d00000;
+  font-size: 17px;
+  margin-top: 35px;
+}
+
+/* Validierung für Datum/Zeit */
+input[type="date"].valid,
+input[type="time"].valid {
+  border-color: #009900;
+}
+
+input[type="date"].invalid,
+input[type="time"].invalid {
+  border-color: #d00000;
+}
+
+/* Autocomplete */
+.input-wrapper {
   position: relative;
 }
 
-.suggestions div {
-  background: #fff;
-  border: 1px solid #ccc;
+.suggestions {
+  position: absolute;
+  color: #5c5958;
   border-top: none;
-  padding: 8px;
+  width: 100%;
+  z-index: 50;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  font-size: 20px;
+  padding-top: 10px;
+}
+
+.suggestions div {
+  padding: 10px;
   cursor: pointer;
 }
 
 .suggestions div:hover {
-  background-color: #e6f0ff;
+  background: #e8f0ff;
+}
+
+/* Buttons */
+.sbb-btn {
+  background: #e60000;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 17px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sbb-btn:hover {
+  background: #bb0000;
+}
+
+.button-wrapper {
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* Result Box */
+.results-box {
+  max-width: 49%;
+  margin: 30px 26%;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+#connections li {
+  list-style: none;
+  background: #eef4ff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+/* --- LADE-ANIMATION --- */
+.loader {
+  border: 6px solid #ccc;
+  border-top: 6px solid #e60000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin: 20px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

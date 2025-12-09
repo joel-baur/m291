@@ -2,49 +2,101 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>SBB Fahrplan Formular</title>
+  <title>SBB Fahrplan</title>
   <link rel="stylesheet" href="formular-css.css">
 </head>
+
 <body>
 
-  <h2>🧭 SBB Fahrplan</h2>
+  <!-- HEADER -->
+  <header class="sbb-header">
+    <img src="SBB.png" alt="SBB Logo" class="sbb-logo">
+    <h1>FAHRPLAN & STRECKENINFO</h1>
+  </header>
+  <div class="sbb-redline"></div>
 
-  <form id="fahrplanForm">
-    <!-- Schritt 1 -->
-    <div class="step" id="step1">
-      <label for="from">Von:</label>
-      <input type="text" id="from" name="from" required aria-describedby="fromError" autocomplete="off">
-      <div id="fromSuggestions" class="suggestions"></div>
-      <span id="fromError" class="error">Bitte geben Sie einen gültigen Ort ein.</span>
+  <!-- --- KARUSSELL MIT PFEILEN --- -->
+<div class="carousel">
+  <button class="carousel-btn left" id="prevBtn">&#10094;</button>
 
-      <label for="to">Nach:</label>
-      <input type="text" id="to" name="to" required aria-describedby="toError" autocomplete="off">
-      <div id="toSuggestions" class="suggestions"></div>
-      <span id="toError" class="error">Bitte geben Sie einen gültigen Zielort ein.</span>
+  <div class="carousel-track-wrapper">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-item">
+        <h2>Willkommen beim SBB Fahrplan</h2>
+        <p>Schnell & zuverlässig Verbindungen finden.</p>
+      </div>
+      <div class="carousel-item">
+        <h2>Echtzeitdaten</h2>
+        <p>Verspätungen und Ausfälle live abrufen.</p>
+      </div>
+      <div class="carousel-item">
+        <h2>Alle Verkehrsmittel</h2>
+        <p>Zug, Bus, Tram, Schiff – alles in einer Suche.</p>
+      </div>
+    </div>
+  </div>
 
-      <button type="button" id="nextBtn">Weiter</button>
+  <button class="carousel-btn right" id="nextBtn2">&#10095;</button>
+</div>
+
+  <!-- FORM -->
+  <form id="fahrplanForm" class="fahrplan-container">
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <div class="grid-2">
+        <div>
+          <label for="from">VON</label>
+          <div class="input-wrapper">
+            <input type="text" id="from" autocomplete="off">
+            <div id="fromSuggestions" class="suggestions">Geben sie eine Haltestelle oder Adresse an</div>
+          </div>
+          <span id="fromError" class="error"></span>
+        </div>
+
+        <div>
+          <label for="to">BIS</label>
+          <div class="input-wrapper">
+            <input type="text" id="to" autocomplete="off">
+            <div id="toSuggestions" class="suggestions">Geben sie eine Haltestelle oder Adresse an</div>
+          </div>
+          <span id="toError" class="error"></span>
+        </div>
+      </div>
+
+      <div class="button-wrapper">
+        <button type="button" id="nextBtn" class="sbb-btn">Weiter</button>
+      </div>
     </div>
 
-    <!-- Schritt 2 -->
-    <div class="step hidden" id="step2">
-      <label for="date">Abfahrtsdatum:</label>
-      <input type="date" id="date" name="date" required aria-describedby="dateError">
-      <span id="dateError" class="error">Bitte wählen Sie ein gültiges Datum.</span>
+    <!-- STEP 2 -->
+    <div id="step2" class="hidden">
+      <div class="grid-2">
+        <div>
+          <label for="date">DATUM</label>
+          <input type="date" id="date">Geben sie ihr Abfahrtsdatum an
+        </div>
 
-      <label for="time">Abfahrtszeit:</label>
-      <input type="time" id="time" name="time" required aria-describedby="timeError">
-      <span id="timeError" class="error">Bitte geben Sie eine gültige Zeit ein.</span>
-
-      <button type="submit">Fahrplan suchen</button>
+        <div>
+          <label for="time">ZEIT</label>
+          <input type="time" id="time">Geben sie ihre Abfahrtszeit an
+        </div>
+      </div>
+      <button type="submit" class="sbb-btn">Fahrplan suchen</button>
     </div>
+
   </form>
 
-  <!-- Ergebnisse -->
-  <div id="results" class="hidden">
+  <!-- RESULTS -->
+  <div id="results" class="hidden results-box">
     <h3>Verbindungen</h3>
+
+    <div id="loader" class="loader hidden"></div>
+
     <ul id="connections"></ul>
   </div>
 
   <script src="formular-js.js"></script>
+
 </body>
 </html>
