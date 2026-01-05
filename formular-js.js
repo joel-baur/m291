@@ -13,6 +13,12 @@ const loader = document.getElementById("loader");
 // -------------------------------------------------
 function formatTime(time) {
   if (!time) return "–";
+
+  // Falls API nur "HH:MM" liefert (z.B. leg.to.time)
+  if (typeof time === "string" && /^\d{1,2}:\d{2}$/.test(time)) {
+    return time;
+  }
+
   const d = new Date(time);
   return isNaN(d)
     ? "–"
@@ -129,19 +135,7 @@ form.addEventListener("submit", async e => {
       return;
     }
 
-    // Ankunftszeiten eine Verbindung nach oben verschoben
-    const shiftedArrivals = connections.map((conn, i) => {
-      const nextConn = connections[i + 1];
-      if (nextConn) {
-        const nextRideLegs = safeArray(nextConn.legs).filter(l => l.line && l.departure);
-        return formatTime(nextRideLegs[nextRideLegs.length - 1]?.to?.time || nextConn.arrival);
-      } else {
-        const rideLegs = safeArray(conn.legs).filter(l => l.line && l.departure);
-        return formatTime(conn.arrival || rideLegs[rideLegs.length - 1]?.to?.time);
-      }
-    });
-
-    connections.forEach((conn, i) => {
+    connections.forEach(conn => {
       const li = document.createElement("li");
       const legs = safeArray(conn.legs);
       const rideLegs = legs.filter(l => l.line && l.departure);
@@ -167,7 +161,7 @@ form.addEventListener("submit", async e => {
         });
       }
 
-      const overallArrival = shiftedArrivals[i];
+      const overallArrival = formatTime(conn.arrival);
 
       li.innerHTML = `
         <strong>${conn.from}</strong> → <strong>${conn.to}</strong><br>
