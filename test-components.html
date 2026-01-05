@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SBB Fahrplan — Komponenten Demo</title>
+  <style>
+    :root{--accent:#0057b8;--muted:#666}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.4;margin:0;background:#f6f7fb;color:#111}
+    header{background:linear-gradient(90deg,var(--accent),#0068d6);color:#fff;padding:12px 18px}
+    .container{max-width:1100px;margin:18px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(15,20,30,0.06)}
+    nav{display:flex;gap:12px;align-items:center}
+    nav .brand{font-weight:700}
+    .controls{margin-left:auto;display:flex;gap:8px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.2)}
+
+    /* Carousel */
+    .carousel{position:relative;overflow:hidden;border-radius:8px}
+    .slides{display:flex;transition:transform .5s ease}
+    .slide{min-width:100%;padding:28px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;height:180px;color:#fff}
+    .slide h2{margin:0}
+    .carousel .nav{position:absolute;top:50%;transform:translateY(-50%);width:100%;display:flex;justify-content:space-between;padding:0 10px}
+    .dotbar{display:flex;gap:6px;justify-content:center;margin-top:8px}
+    .dot{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer}
+    .dot.active{background:var(--accent)}
+
+    /* Search form */
+    form.search{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    form.search input, form.search select{padding:8px;border-radius:8px;border:1px solid #ddd}
+
+    /* Accordion */
+    .accordion{margin-top:14px}
+    .acc-item{border-top:1px solid #eee}
+    .acc-header{display:flex;justify-content:space-between;align-items:center;padding:12px;cursor:pointer}
+    .acc-body{padding:12px;border-top:1px solid #f0f0f0;display:none}
+
+    /* Timetable table */
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+    th{background:#fafafa}
+    tr:hover{background:#fbfdff}
+
+    /* Cards */
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+    .card{padding:12px;border-radius:10px;border:1px solid #eee;background:#fff}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center}
+    .modal{background:#fff;padding:18px;border-radius:10px;max-width:600px;width:90%}
+
+    footer{padding:14px;text-align:center;color:var(--muted);font-size:14px}
+
+    @media (max-width:700px){.controls{display:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex;align-items:center">
+      <nav>
+        <div class="brand">SBB Fahrplan — Komponenten Demo</div>
+        <div class="controls">
+          <button class="btn" id="helpBtn">Hilfe</button>
+          <button class="btn ghost" id="aboutBtn">Über</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <!-- Carousel -->
+    <section aria-label="Highlights">
+      <div class="carousel" id="carousel">
+        <div class="slides" id="slides">
+          <div class="slide" style="background:linear-gradient(120deg,#0057b8,#0077e6)"><h2>Reisen Sie smart: Live-Fahrplan</h2></div>
+          <div class="slide" style="background:linear-gradient(120deg,#006f3c,#009955)"><h2>Pünktlich ankommen: Verbindungen vergleichen</h2></div>
+          <div class="slide" style="background:linear-gradient(120deg,#8a3ffc,#5b2be6)"><h2>Ticketinfos & Verspätungen</h2></div>
+        </div>
+        <div class="nav">
+          <button class="btn" id="prev">◀</button>
+          <button class="btn" id="next">▶</button>
+        </div>
+      </div>
+      <div class="dotbar" id="dots"></div>
+    </section>
+
+    <!-- Search form (component) -->
+    <section aria-label="Fahrplansuche">
+      <h3>Fahrplansuche</h3>
+      <form class="search" id="searchForm" onsubmit="return false">
+        <input id="from" placeholder="Ab (z. B. Zürich HB)" value="Zürich HB">
+        <input id="to" placeholder="Nach (z. B. Bern)" value="Bern">
+        <input type="time" id="time" value="09:00">
+        <select id="day">
+          <option value="today">Heute</option>
+          <option value="tomorrow">Morgen</option>
+        </select>
+        <button class="btn" id="searchBtn">Suchen</button>
+        <button class="btn" id="resetBtn" type="button" style="background:#777">Reset</button>
+      </form>
+    </section>
+
+    <!-- Cards (component) -->
+    <section aria-label="Schnelle Infos">
+      <div class="cards">
+        <div class="card"><strong>Nächste Verbindung</strong><p id="nextConn">Zürich HB → Bern 09:12 (IC)</p></div>
+        <div class="card"><strong>Verspätung</strong><p id="delay">Kein betr. Verspätungen</p></div>
+        <div class="card"><strong>Ticket Tipp</strong><p>Gruppenticket möglich — prüfen Sie Ermässigungen</p></div>
+      </div>
+    </section>
+
+    <!-- Accordion (component) -->
+    <section class="accordion" aria-label="Erklärung Komponenten">
+      <h3>Komponenten (Accordion)</h3>
+      <div class="acc-item">
+        <div class="acc-header" data-acc="a1">Was ist dieses Demo? <span>+</span></div>
+        <div class="acc-body" id="a1">Dies ist eine statische Demo eines Fahrplans mit UI-Komponenten: Carousel, Accordion, Modal, Search, Cards, Tabelle.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" data-acc="a2">Welche Komponenten sind nützlich? <span>+</span></div>
+        <div class="acc-body" id="a2">Für Ihr Projekt besonders hilfreich sind: die Suchkomponente (Fahrplansuche), der Fahrplan-Tabellen-Viewer, Filter/Sortierung und Info-Modals für einzelne Verbindungen.</div>
+      </div>
+      <div class="acc-item">
+        <div class="acc-header" data-acc="a3">Integration mit Live-Daten <span>+</span></div>
+        <div class="acc-body" id="a3">Für Echtzeitdaten würden Sie eine API (z.B. SBB Open API) nutzen. Hier ist eine statische Simulation.</div>
+      </div>
+    </section>
+
+    <!-- Timetable (component: table + modal) -->
+    <section aria-label="Fahrplantabelle">
+      <h3>Fahrplan — Beispielverbindungen</h3>
+      <table id="timetable" role="table">
+        <thead>
+          <tr><th>Abfahrt</th><th>Ankunft</th><th>Zug</th><th>Dauer</th><th>Gleis</th><th></th></tr>
+        </thead>
+        <tbody>
+          <!-- sample rows -->
+          <tr data-id="1"><td>09:12</td><td>09:58</td><td>IC 8</td><td>46m</td><td>4</td><td><button class="btn details">Details</button></td></tr>
+          <tr data-id="2"><td>09:42</td><td>10:30</td><td>IR 13</td><td>48m</td><td>6</td><td><button class="btn details">Details</button></td></tr>
+          <tr data-id="3"><td>10:12</td><td>10:58</td><td>RE 1</td><td>46m</td><td>2</td><td><button class="btn details">Details</button></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Tabs (additional component) -->
+    <section aria-label="Tabs">
+      <h3>Ansicht wählen (Tabs)</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn" data-tab="table">Tabelle</button>
+        <button class="btn" data-tab="map">Karte</button>
+        <button class="btn" data-tab="stats">Statistik</button>
+      </div>
+      <div id="tabContent" style="margin-top:12px">Tabelle ist aktiv. (Karte/Statistik sind Demo-Platzhalter.)</div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">Demo — Nicht-offizielle SBB-Seite. Datenbeispiele nur zu Demonstrationszwecken.</div>
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Verbindungsdetails</h3>
+      <div id="modalBody"></div>
+      <div style="text-align:right;margin-top:12px">
+        <button class="btn" id="closeModal">Schliessen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple Carousel
+    (function(){
+      const slides = document.getElementById('slides');
+      const total = slides.children.length; let idx = 0; const dots = document.getElementById('dots');
+      for(let i=0;i<total;i++){const d=document.createElement('div');d.className='dot';d.dataset.i=i;d.addEventListener('click',()=>go(i));dots.appendChild(d)}
+      function update(){slides.style.transform='translateX(' + (-idx*100) + '%)';Array.from(dots.children).forEach((d,i)=>d.classList.toggle('active',i===idx))}
+      function go(i){idx=i;update()}
+      document.getElementById('prev').addEventListener('click',()=>{idx=(idx-1+total)%total;update()});
+      document.getElementById('next').addEventListener('click',()=>{idx=(idx+1)%total;update()});
+      update();
+      // autoplay
+      let timer=setInterval(()=>{idx=(idx+1)%total;update()},5000);
+      document.getElementById('carousel').addEventListener('mouseover',()=>clearInterval(timer));
+      document.getElementById('carousel').addEventListener('mouseout',()=>timer=setInterval(()=>{idx=(idx+1)%total;update()},5000));
+    })();
+
+    // Accordion
+    document.querySelectorAll('.acc-header').forEach(h=>{
+      h.addEventListener('click',()=>{
+        const id = h.dataset.acc; const body = document.getElementById(id);
+        const open = body.style.display === 'block';
+        // close others
+        document.querySelectorAll('.acc-body').forEach(b=>b.style.display='none');
+        document.querySelectorAll('.acc-header span').forEach(s=>s.textContent='+');
+        if(!open){body.style.display='block';h.querySelector('span').textContent='−'}
+      })
+    });
+
+    // Modal & Details
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modalBody');
+    document.querySelectorAll('.details').forEach(btn=>btn.addEventListener('click',e=>{
+      const tr = e.target.closest('tr'); const id = tr.dataset.id;
+      // sample details based on id
+      const samples = {
+        '1':{route:'Zürich HB → Bern via Olten',stops:['Zürich HB','Olten','Bern'],notes:'IC — Sitzplatz empfohlen.'},
+        '2':{route:'Zürich HB → Bern (Regional)',stops:['Zürich HB','Regensdorf','Aarau','Bern'],notes:'IR — mehrere Zwischenhalte.'},
+        '3':{route:'Zürich HB → Bern (RE)',stops:['Zürich HB','Baden','Olten','Bern'],notes:'RE — Regionalexpress.'}
+      };
+      const info = samples[id]||{route:'Unbekannt',stops:[],notes:''};
+      modalBody.innerHTML = `<p><strong>Route:</strong> ${info.route}</p><p><strong>Halte:</strong> ${info.stops.join(', ')}</p><p><strong>Hinweis:</strong> ${info.notes}</p>`;
+      modal.style.display='flex';
+    }));
+    document.getElementById('closeModal').addEventListener('click',()=>modal.style.display='none');
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none'});
+
+    // Search form filters table (static demo)
+    document.getElementById('searchBtn').addEventListener('click',()=>{
+      const from = document.getElementById('from').value.toLowerCase();
+      const to = document.getElementById('to').value.toLowerCase();
+      // For demo just update cards and simulate results
+      document.getElementById('nextConn').textContent = `${from || 'Start'} → ${to || 'Ziel'} 09:12 (IC)`;
+      document.getElementById('delay').textContent = 'Keine aktuellen Störungen';
+      // highlight first row
+      const rows = document.querySelectorAll('#timetable tbody tr');
+      rows.forEach(r=>r.style.background='');
+      rows[0].style.background='rgba(0,87,184,0.06)';
+    });
+    document.getElementById('resetBtn').addEventListener('click',()=>{document.getElementById('from').value='Zürich HB';document.getElementById('to').value='Bern';document.getElementById('time').value='09:00';document.getElementById('nextConn').textContent='Zürich HB → Bern 09:12 (IC)';document.getElementById('delay').textContent='Kein betr. Verspätungen'});
+
+    // Tabs
+    document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
+      const t = event.target.dataset.tab; const c=document.getElementById('tabContent');
+      if(t==='table') c.textContent='Tabelle ist aktiv. (Sie sehen die Liste oben).';
+      if(t==='map') c.textContent='Kartenansicht — hier könnten Sie eine Karte einbetten (z.B. Leaflet).';
+      if(t==='stats') c.textContent='Statistik — Beispiel: Auslastung, Durchschnittsverspätung.';
+    }));
+
+    // About/help buttons
+    document.getElementById('helpBtn').addEventListener('click',()=>alert('Dieses Demo zeigt UI-Komponenten. Für Live-Daten SBB API integrieren.'));
+    document.getElementById('aboutBtn').addEventListener('click',()=>alert('Nicht-offizielles Demo — nur Beispielcode.'));
+
+    // Accessibility: keyboard support for accordion
+    document.querySelectorAll('.acc-header').forEach(h=>{h.tabIndex=0;h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')h.click()})});
+  </script>
+</body>
+</html>

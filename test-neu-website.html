@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SBB – Strecke wählen</title>
+  <link rel="stylesheet" href="test-neu-website.css" />
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <img class="logo" src="SBB_CFF_FFS_logo.svg.png" alt="SBB CFF FFS" />
+      <h1>Billette &amp; Reservation – Strecke wählen</h1>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <p class="pill">Schritt 1 – Von/Bis wählen</p>
+
+    <div id="errorSummary" class="alert is-hidden"></div>
+
+    <form id="routeForm">
+      <!-- Von/Bis -->
+      <section>
+        <h2 class="step-title">Von / Bis</h2>
+        <div class="row">
+          <div class="field">
+            <label for="from">Von (Haltestelle/Adresse) *</label>
+            <input id="from" name="from" type="text" autocomplete="off" list="from-suggest" placeholder="z.B. Basel SBB" />
+            <datalist id="from-suggest"></datalist>
+            <div class="hint">Mindestens 2 Zeichen eingeben, Vorschläge folgen automatisch.</div>
+          </div>
+          <div class="field">
+            <label for="to">Bis (Haltestelle/Adresse) *</label>
+            <input id="to" name="to" type="text" autocomplete="off" list="to-suggest" placeholder="z.B. Zürich HB" />
+            <datalist id="to-suggest"></datalist>
+            <div class="hint">Mindestens 2 Zeichen eingeben, Vorschläge folgen automatisch.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- Datum/Zeit -->
+      <section id="dateTimeSection">
+        <p class="pill">Schritt 2 – Datum &amp; Uhrzeit</p>
+        <h2 class="step-title">Datum &amp; Uhrzeit</h2>
+        <div class="row">
+          <div class="field">
+            <label for="date">Datum</label>
+            <input id="date" name="date" type="date" />
+            <div class="hint">Standard ist heute.</div>
+          </div>
+          <div class="field">
+            <label for="time">Uhrzeit</label>
+            <input id="time" name="time" type="time" />
+            <div class="hint">Standard ist jetzt.</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" id="searchBtn" class="btn">Verbindungen suchen</button>
+        </div>
+      </section>
+    </form>
+
+    <!-- Resultate -->
+    <section id="results" class="is-hidden">
+      <h2 class="step-title">Verbindungen</h2>
+      <ul id="resultsList" class="results-list"></ul>
+    </section>
+  </main>
+
+  <script src="test-neu-website.js"></script>
+</body>
+</html>

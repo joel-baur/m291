@@ -44,7 +44,7 @@ body {
   overflow: hidden;
   background: rgb(255, 255, 255);
   position: relative;
-  padding-top: 30px;
+  padding-top: 0px;
   padding-bottom: 0px;
   color: white;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); /* horizontal, vertikal, Weichzeichner, Farbe */
@@ -229,6 +229,7 @@ input[type="time"].invalid {
   font-size: 17px;
   border-radius: 8px;
   cursor: pointer;
+  margin-right: -3%;
 }
 
 .sbb-btn:hover {
@@ -242,19 +243,25 @@ input[type="time"].invalid {
 
 /* Result Box */
 .results-box {
-  max-width: 49%;
+  max-width: 50%;
   margin: 30px 26%;
   background: white;
-  padding: 20px;
   border-radius: 12px;
+}
+
+.verbindung {
+  font-size: 30px;
 }
 
 #connections li {
   list-style: none;
-  background: #eef4ff;
+  background: #0011ffc3;
   padding: 15px;
   margin: 10px 0;
   border-radius: 10px;
+  color: rgb(0, 0, 0);
+  font-weight: 500;
+  font-size: 120%;
 }
 
 /* --- LADE-ANIMATION --- */
@@ -271,4 +278,196 @@ input[type="time"].invalid {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+   ========================= */
+
+/* --- Tablets & kleinere Screens --- */
+@media (max-width: 1024px) {
+
+  .fahrplan-container,
+  .results-box {
+    max-width: 80%;
+    margin: 30px auto;
+  }
+
+  .sbb-header {
+    gap: 40px;
+  }
+
+  .sbb-logo {
+    width: 30%;
+  }
+}
+
+/* --- Mobile (Portrait) --- */
+@media (max-width: 1200px) {
+
+  /* Header */
+  .sbb-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .sbb-logo {
+    width: 45%;
+  }
+
+  .sbb-header h1 {
+    font-size: 180%;
+  }
+
+  /* Carousel */
+  .carousel-item {
+    padding: 35px 15px;
+  }
+
+  .carousel-item h2 {
+    font-size: 22px;
+  }
+
+  .carousel-item p {
+    font-size: 16px;
+  }
+
+  /* Form & Results */
+  .fahrplan-container,
+  .results-box {
+    max-width: 90%;
+    margin: 25px auto;
+  }
+
+  /* Grid → 1 Spalte */
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  label {
+    font-size: 20px;
+  }
+
+  input {
+    font-size: 18px;
+    padding: 12px;
+  }
+
+  .button-wrapper {
+    text-align: center;
+  }
+
+  .sbb-btn {
+    width: 100%;
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  /* Autocomplete */
+  .suggestions {
+    font-size: 18px;
+  }
+}
+
+/* --- Sehr kleine Geräte (z. B. iPhone SE) --- */
+@media (max-width: 480px) {
+
+  .sbb-header h1 {
+    font-size: 160%;
+  }
+
+  .carousel-btn {
+    font-size: 22px;
+    padding: 8px;
+  }
+
+  .carousel-item h2 {
+    font-size: 20px;
+  }
+
+  .carousel-item p {
+    font-size: 15px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+}
+
+
+/* =========================
+   SBB VERBINDUNGS-DESIGN
+   ========================= */
+
+.connections-list {
+  padding: 0;
+  margin: 0;
+}
+
+/* Einzelne Verbindung */
+.connection-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+/* Kopfzeile */
+.connection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.connection-duration {
+  color: #e60000;
+  font-weight: bold;
+}
+
+/* Datum */
+.connection-date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  gap: 16px;
+}
+
+.timeline-times {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.timeline-line {
+  width: 2px;
+  background: #000;
+  margin: 4px 0;
+}
+
+.timeline-stations {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .connection-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }
