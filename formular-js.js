@@ -129,7 +129,19 @@ form.addEventListener("submit", async e => {
       return;
     }
 
-    connections.forEach(conn => {
+    // Ankunftszeiten eine Verbindung nach oben verschoben
+    const shiftedArrivals = connections.map((conn, i) => {
+      const nextConn = connections[i + 1];
+      if (nextConn) {
+        const nextRideLegs = safeArray(nextConn.legs).filter(l => l.line && l.departure);
+        return formatTime(nextRideLegs[nextRideLegs.length - 1]?.to?.time || nextConn.arrival);
+      } else {
+        const rideLegs = safeArray(conn.legs).filter(l => l.line && l.departure);
+        return formatTime(conn.arrival || rideLegs[rideLegs.length - 1]?.to?.time);
+      }
+    });
+
+    connections.forEach((conn, i) => {
       const li = document.createElement("li");
       const legs = safeArray(conn.legs);
       const rideLegs = legs.filter(l => l.line && l.departure);
@@ -143,7 +155,6 @@ form.addEventListener("submit", async e => {
 
         rideLegs.forEach(leg => {
           const dep = formatTime(leg.departure);
-          // Ankunft zuverlässig aus 'to.time' oder 'leg.arrival'
           const arr = formatTime(leg.to?.time || leg.arrival);
 
           legsHTML += `
@@ -156,8 +167,7 @@ form.addEventListener("submit", async e => {
         });
       }
 
-      // Ankunft auf Gesamtverbindung: letzte Ankunft des letzten Legs
-      const overallArrival = formatTime(conn.arrival || rideLegs[rideLegs.length - 1]?.to?.time);
+      const overallArrival = shiftedArrivals[i];
 
       li.innerHTML = `
         <strong>${conn.from}</strong> → <strong>${conn.to}</strong><br>

@@ -58,7 +58,7 @@ function humanDurationFromSeconds(seconds){
   return (h ? h + " h " : "") + m + " min";
 }
 
-// Elemente holen
+// Elemente
 const form = byId("routeForm");
 const searchBtn = byId("searchBtn");
 const fromInput = byId("from");
@@ -141,6 +141,7 @@ function renderConnections(data){
     const transfers = legs.length ? Math.max(legs.length - 1, 0) : 0;
     const durationText = humanDurationFromSeconds(c.duration);
 
+    // Haupt-Item
     const li = document.createElement("li");
     li.className = "result-item";
 
@@ -154,6 +155,31 @@ function renderConnections(data){
 
     li.appendChild(title);
     li.appendChild(meta);
+
+    // Details-Container
+    const details = document.createElement("div");
+    details.className = "connection-details is-hidden";
+
+    legs.forEach(function(leg){
+      const legDiv = document.createElement("div");
+      const depTime = formatTimeLabel(leg.departure);
+      const arrTime = formatTimeLabel(leg.arrival);
+      const from = leg.from || "–";
+      const to = leg.to || "–";
+      const line = leg.line || "–";
+      const platform = leg.platform ? `Gleis ${leg.platform}` : "";
+
+      legDiv.textContent = `${depTime} ${from} → ${arrTime} ${to} (${line}) ${platform}`;
+      details.appendChild(legDiv);
+    });
+
+    li.appendChild(details);
+
+    // Klick für Details ein-/ausblenden
+    li.addEventListener("click", () => {
+      details.classList.toggle("is-hidden");
+    });
+
     resultsList.appendChild(li);
   });
 

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SBB – Strecke wählen</title>
+  <style>
+    :root{
+      --sbb-red:#EB0000;
+      --text:#1A1A1A;
+      --muted:#6B7280;
+      --border:#E5E7EB;
+      --bg:#FFFFFF;
+      --focus:#EB0000;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.5;
+    }
+    .container{max-width:960px;margin:0 auto;padding:16px}
+    header{border-bottom:4px solid var(--sbb-red);background:#fff}
+    .header-inner{display:flex;align-items:center;gap:12px;padding:12px 0}
+    .logo{height:28px;width:auto;display:block;object-fit:contain}
+    h1{margin:0;font-size:1.4rem}
+    label{display:block;font-weight:600;margin:.25rem 0}
+    input,button{font:inherit}
+    input{
+      width:100%;
+      padding:10px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      background:#fff;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    input:focus,button:focus{
+      outline:3px solid var(--focus);
+      outline-offset:2px;
+    }
+    .field{margin-bottom:14px}
+    .hint{color:var(--muted);font-size:.95rem}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    @media (min-width:700px){
+      .row{grid-template-columns:1fr 1fr}
+    }
+    .actions{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .btn{
+      appearance:none;
+      border:0;
+      border-radius:6px;
+      padding:10px 14px;
+      font-weight:700;
+      cursor:pointer;
+      background:var(--sbb-red);
+      color:#fff;
+    }
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .alert{
+      border-left:4px solid #B00020;
+      background:#FFF5F5;
+      padding:10px;
+      border-radius:6px;
+      margin:12px 0;
+    }
+    .is-hidden{display:none!important}
+    .pill{
+      display:inline-block;
+      background:#F3F4F6;
+      border:1px solid var(--border);
+      padding:4px 8px;
+      border-radius:999px;
+      color:#374151;
+      font-size:.9rem;
+      margin-bottom:8px;
+    }
+    .step-title{margin:.5rem 0 1rem}
+    .divider{height:1px;background:var(--border);margin:16px 0}
+
+    /* Resultate: einfache Karten-Liste */
+    #results{margin-top:20px}
+    .results-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:8px;
+    }
+    .result-item{
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:10px;
+      background:#fff;
+    }
+    .result-title{
+      font-weight:700;
+      margin:0 0 4px;
+    }
+    .result-meta{
+      margin:0;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <img class="logo" src="SBB_CFF_FFS_logo.svg.png" alt="SBB CFF FFS" />
+      <h1>Billette &amp; Reservation – Strecke wählen</h1>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <p class="pill">Schritt 1 – Von/Bis wählen</p>
+
+    <div id="errorSummary" class="alert is-hidden"></div>
+
+    <form id="routeForm">
+      <!-- Von/Bis -->
+      <section>
+        <h2 class="step-title">Von / Bis</h2>
+        <div class="row">
+          <div class="field">
+            <label for="from">Von (Haltestelle/Adresse) *</label>
+            <input id="from" name="from" type="text" autocomplete="off" list="from-suggest" placeholder="z.B. Basel SBB" />
+            <datalist id="from-suggest"></datalist>
+            <div class="hint">Mindestens 2 Zeichen eingeben, Vorschläge folgen automatisch.</div>
+          </div>
+          <div class="field">
+            <label for="to">Bis (Haltestelle/Adresse) *</label>
+            <input id="to" name="to" type="text" autocomplete="off" list="to-suggest" placeholder="z.B. Zürich HB" />
+            <datalist id="to-suggest"></datalist>
+            <div class="hint">Mindestens 2 Zeichen eingeben, Vorschläge folgen automatisch.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- Datum/Zeit -->
+      <section id="dateTimeSection">
+        <p class="pill">Schritt 2 – Datum &amp; Uhrzeit</p>
+        <h2 class="step-title">Datum &amp; Uhrzeit</h2>
+        <div class="row">
+          <div class="field">
+            <label for="date">Datum</label>
+            <input id="date" name="date" type="date" />
+            <div class="hint">Standard ist heute.</div>
+          </div>
+          <div class="field">
+            <label for="time">Uhrzeit</label>
+            <input id="time" name="time" type="time" />
+            <div class="hint">Standard ist jetzt.</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" id="searchBtn" class="btn">Verbindungen suchen</button>
+        </div>
+      </section>
+    </form>
+
+    <!-- Resultate -->
+    <section id="results" class="is-hidden">
+      <h2 class="step-title">Verbindungen</h2>
+      <ul id="resultsList" class="results-list"></ul>
+    </section>
+  </main>
+
+  <script>
+    // Hilfsfunktionen
+    const byId = (id) => document.getElementById(id);
+
+    function showError(msg){
+      const box = byId("errorSummary");
+      box.textContent = msg;
+      box.classList.remove("is-hidden");
+    }
+
+    function clearError(){
+      const box = byId("errorSummary");
+      box.textContent = "";
+      box.classList.add("is-hidden");
+    }
+
+    const fmt2 = (n) => n.toString().padStart(2, "0");
+
+    function ensureDefaults(){
+      const dateEl = byId("date");
+      const timeEl = byId("time");
+      const now = new Date();
+
+      if(!dateEl.value){
+        const y = now.getFullYear();
+        const m = fmt2(now.getMonth() + 1);
+        const d = fmt2(now.getDate());
+        dateEl.value = y + "-" + m + "-" + d;
+      }
+      if(!timeEl.value){
+        const hh = fmt2(now.getHours());
+        const mm = fmt2(now.getMinutes());
+        timeEl.value = hh + ":" + mm;
+      }
+    }
+
+    function formatDateForApi(yyyyMmDd){
+      const parts = yyyyMmDd.split("-");
+      if(parts.length !== 3) return "";
+      const y = parts[0];
+      const m = parts[1];
+      const d = parts[2];
+      return d + "." + m + "." + y; // DD.MM.YYYY
+    }
+
+    function formatTimeLabel(dateTimeString){
+      // Erwartet "YYYY-MM-DD HH:MM:SS" oder "HH:MM", gibt "HH:MM" zurück
+      if(!dateTimeString || typeof dateTimeString !== "string") return "–";
+      if(dateTimeString.length >= 16){
+        return dateTimeString.slice(11, 16);
+      }
+      return dateTimeString;
+    }
+
+    function humanDurationFromSeconds(seconds){
+      if(!seconds || isNaN(seconds)) return "–";
+      const totalMin = Math.round(seconds / 60);
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return (h ? h + " h " : "") + m + " min";
+    }
+
+    // Elemente holen
+    const form = byId("routeForm");
+    const searchBtn = byId("searchBtn");
+    const fromInput = byId("from");
+    const toInput = byId("to");
+    const fromSuggest = byId("from-suggest");
+    const toSuggest = byId("to-suggest");
+    const resultsSection = byId("results");
+    const resultsList = byId("resultsList");
+
+    const ROUTE_ENDPOINT = "https://search.ch/timetable/api/route.json";
+    const COMPLETION_ENDPOINT = "https://search.ch/timetable/api/completion.json";
+
+    // Autocomplete (einfach)
+    function handleAutocomplete(kind){
+      const input = kind === "from" ? fromInput : toInput;
+      const datalist = kind === "from" ? fromSuggest : toSuggest;
+
+      if(!input || !datalist) return;
+      const term = input.value.trim();
+      if(term.length < 2){
+        datalist.innerHTML = "";
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      const url = COMPLETION_ENDPOINT + "?term=" + encodeURIComponent(term);
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4 && xhr.status === 200){
+          try{
+            const data = JSON.parse(xhr.responseText);
+            datalist.innerHTML = "";
+            if(Array.isArray(data)){
+              data.forEach(function(item){
+                if(!item.label) return;
+                const opt = document.createElement("option");
+                opt.value = item.label;
+                datalist.appendChild(opt);
+              });
+            }
+          }catch(e){
+            console.error("Fehler beim Lesen der Vorschläge", e);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    fromInput.addEventListener("input", function(){
+      handleAutocomplete("from");
+    });
+
+    toInput.addEventListener("input", function(){
+      handleAutocomplete("to");
+    });
+
+    // Resultate rendern (einfach)
+    function clearResults(){
+      resultsList.innerHTML = "";
+    }
+
+    function renderConnections(data){
+      clearResults();
+
+      if(!data || !Array.isArray(data.connections) || data.connections.length === 0){
+        const li = document.createElement("li");
+        li.className = "result-item";
+        li.textContent = "Keine Verbindungen gefunden.";
+        resultsList.appendChild(li);
+        resultsSection.classList.remove("is-hidden");
+        return;
+      }
+
+      data.connections.forEach(function(c){
+        const legs = Array.isArray(c.legs) ? c.legs : [];
+        const first = legs[0];
+        const last = legs[legs.length - 1];
+
+        const dep = c.from_time || (first && first.departure) || "";
+        const arr = c.to_time || (last && last.arrival) || "";
+
+        const depLabel = formatTimeLabel(dep);
+        const arrLabel = formatTimeLabel(arr);
+
+        const transfers = legs.length ? Math.max(legs.length - 1, 0) : 0;
+        const durationText = humanDurationFromSeconds(c.duration);
+
+        const li = document.createElement("li");
+        li.className = "result-item";
+
+        const title = document.createElement("p");
+        title.className = "result-title";
+        title.textContent = depLabel + " → " + arrLabel;
+
+        const meta = document.createElement("p");
+        meta.className = "result-meta";
+        meta.textContent = "Dauer: " + durationText + " · Umstiege: " + transfers;
+
+        li.appendChild(title);
+        li.appendChild(meta);
+        resultsList.appendChild(li);
+      });
+
+      resultsSection.classList.remove("is-hidden");
+    }
+
+    // Formular-Submit
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      clearError();
+      clearResults();
+
+      const from = fromInput.value.trim();
+      const to = toInput.value.trim();
+
+      if(from.length < 2 || to.length < 2){
+        showError('Bitte geben Sie "Von" und "Bis" ein (mindestens 2 Zeichen).');
+        return;
+      }
+
+      ensureDefaults();
+      const dateValue = byId("date").value;
+      const timeValue = byId("time").value;
+
+      const dateForApi = formatDateForApi(dateValue);
+      const timeForApi = timeValue ? timeValue.replace(":", "") : "";
+
+      let url = ROUTE_ENDPOINT +
+        "?from=" + encodeURIComponent(from) +
+        "&to=" + encodeURIComponent(to);
+
+      if(dateForApi){
+        url += "&date=" + encodeURIComponent(dateForApi);
+      }
+      if(timeForApi){
+        url += "&time=" + encodeURIComponent(timeForApi);
+      }
+      url += "&num=5";
+
+      searchBtn.disabled = true;
+      const oldLabel = searchBtn.textContent;
+      searchBtn.textContent = "Suchen…";
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4){
+          searchBtn.disabled = false;
+          searchBtn.textContent = oldLabel;
+
+          if(xhr.status === 200){
+            try{
+              const data = JSON.parse(xhr.responseText);
+              renderConnections(data);
+            }catch(err){
+              console.error(err);
+              clearResults();
+              const li = document.createElement("li");
+              li.className = "result-item";
+              li.textContent = "Die Antwort der API konnte nicht gelesen werden.";
+              resultsList.appendChild(li);
+              resultsSection.classList.remove("is-hidden");
+            }
+          }else{
+            clearResults();
+            const li = document.createElement("li");
+            li.className = "result-item";
+            li.textContent = "Die Abfrage ist fehlgeschlagen (Status " + xhr.status + "). Bitte später erneut versuchen.";
+            resultsList.appendChild(li);
+            resultsSection.classList.remove("is-hidden");
+          }
+        }
+      };
+      xhr.send();
+    });
+  </script>
+</body>
+</html>
