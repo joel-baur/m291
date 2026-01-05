@@ -1,109 +1,164 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <!-- Meta-Tags für korrekte Anzeige auf Mobilgeräten und Zeichencodierung -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
+
+  <!-- Beschreibung für Suchmaschinen und Vorschaubilder -->
   <meta name="description"
         content="Finde schnell und einfach SBB-Verbindungen mit Abfahrtszeit, Dauer und Umstiegen. Fahrplan-Suche mit Autocomplete und Echtzeitdaten.">
 
+  <!-- Titel, der im Browser-Tab angezeigt wird -->
   <title>SBB Fahrplan</title>
+
+  <!-- CSS-Datei für Layout, Farben, Buttons, Karussell usw. -->
   <link rel="stylesheet" href="formular-css.css">
 </head>
 
 <body>
 
-  <!-- HEADER -->
+  <!-- HEADER: Logo und Titel -->
   <header class="sbb-header">
     <img src="SBB.png" alt="SBB Logo" class="sbb-logo">
     <h1>FAHRPLAN & STRECKENINFO</h1>
   </header>
+
+  <!-- Rote Linie unter dem Header als Design-Element -->
   <div class="sbb-redline"></div>
 
-  <!-- --- KARUSSELL MIT PFEILEN --- -->
-<div class="carousel">
-  <button class="carousel-btn left" id="prevBtn">&#10094;</button>
+  <!-- KARUSSELL MIT PFEILEN -->
+  <div class="carousel">
+    <!-- Linker Pfeil: springt zum vorherigen Item -->
+    <button class="carousel-btn left" id="prevBtn">&#10094;</button>
 
-  <div class="carousel-track-wrapper">
-    <div class="carousel-track" id="carouselTrack">
-      <div class="carousel-item">
-        <h2>Willkommen beim SBB Fahrplan</h2>
-        <p>Schnell & zuverlässig Verbindungen finden.</p>
-      </div>
-      <div class="carousel-item">
-        <h2>Echtzeitdaten</h2>
-        <p>Verspätungen und Ausfälle live abrufen.</p>
-      </div>
-      <div class="carousel-item">
-        <h2>Alle Verkehrsmittel</h2>
-        <p>Zug, Bus, Tram, Schiff – alles in einer Suche.</p>
+    <!-- Wrapper, der die Track-Items enthält; nur ein Item ist sichtbar -->
+    <div class="carousel-track-wrapper">
+      <div class="carousel-track" id="carouselTrack">
+        <!-- Einzelne Karussell-Items -->
+        <div class="carousel-item">
+          <h2>Willkommen beim SBB Fahrplan</h2>
+          <p>Schnell & zuverlässig Verbindungen finden.</p>
+        </div>
+        <div class="carousel-item">
+          <h2>Echtzeitdaten</h2>
+          <p>Verspätungen und Ausfälle live abrufen.</p>
+        </div>
+        <div class="carousel-item">
+          <h2>Alle Verkehrsmittel</h2>
+          <p>Zug, Bus, Tram, Schiff – alles in einer Suche.</p>
+        </div>
       </div>
     </div>
+
+    <!-- Rechter Pfeil: springt zum nächsten Item -->
+    <button class="carousel-btn right" id="nextBtn2">&#10095;</button>
   </div>
 
-  <button class="carousel-btn right" id="nextBtn2">&#10095;</button>
-</div>
-
-  <!-- FORM -->
+  <!-- FAHRPLAN-FORMULAR -->
   <form id="fahrplanForm" class="fahrplan-container">
 
-    <!-- STEP 1 -->
+    <!-- STEP 1: Start- und Zielort -->
     <div id="step1">
       <div class="grid-2">
+        <!-- Startort -->
         <div>
           <label for="from">VON</label>
           <div class="input-wrapper">
             <input type="text" id="from" autocomplete="off">
-            <div id="fromSuggestions" class="suggestions">Geben sie eine Haltestelle oder Adresse an</div>
+            <!-- Vorschläge für Autocomplete -->
+            <div id="fromSuggestions" class="suggestions">
+              Geben Sie eine Haltestelle oder Adresse an
+            </div>
           </div>
+          <!-- Fehleranzeige bei ungültiger Eingabe -->
           <span id="fromError" class="error"></span>
         </div>
 
+        <!-- Zielort -->
         <div>
           <label for="to">BIS</label>
           <div class="input-wrapper">
             <input type="text" id="to" autocomplete="off">
-            <div id="toSuggestions" class="suggestions">Geben sie eine Haltestelle oder Adresse an</div>
+            <div id="toSuggestions" class="suggestions">
+              Geben Sie eine Haltestelle oder Adresse an
+            </div>
           </div>
           <span id="toError" class="error"></span>
         </div>
       </div>
 
+      <!-- Button zum Wechsel zu Step 2 -->
       <div class="button-wrapper">
         <button type="button" id="nextBtn" class="sbb-btn">Weiter</button>
       </div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2: Datum & Zeit -->
     <div id="step2" class="hidden">
       <div class="grid-2">
+        <!-- Abfahrtsdatum -->
         <div>
           <label for="date">DATUM</label>
-          <input type="date" id="date">Geben sie ihr Abfahrtsdatum an
+          <input type="date" id="date">
+          Geben Sie Ihr Abfahrtsdatum an
         </div>
 
+        <!-- Abfahrtszeit -->
         <div>
           <label for="time">ZEIT</label>
-          <input type="time" id="time">Geben sie ihre Abfahrtszeit an
+          <input type="time" id="time">
+          Geben Sie Ihre Abfahrtszeit an
         </div>
       </div>
+
+      <!-- Button zum Absenden des Formulars -->
       <button type="submit" class="sbb-btn">Fahrplan suchen</button>
     </div>
 
   </form>
 
-  <!-- RESULTS -->
-
-  
+  <!-- ERGEBNISSE DER FAHRPLAN-SUCHE -->
   <div id="results" class="hidden results-box">
-    <strong>Verbindungen</strong>
+    <h2><strong>Verbindungen</strong></h3>
 
+    <!-- Loader wird angezeigt, während Daten geladen werden -->
     <div id="loader" class="loader hidden"></div>
 
+    <!-- Liste der Verbindungen; JS füllt <li>-Elemente dynamisch -->
     <ul id="connections"></ul>
   </div>
 
+  <!-- JAVASCRIPT-Datei für Interaktivität -->
   <script src="formular-js.js"></script>
 
-  
+  <!-- 
+  Erklärung der wichtigsten Funktionen:
+
+  1. Karussell:
+     - Die Track-Elemente werden per JS verschoben (translateX), nur ein Item sichtbar.
+     - Buttons left/right steuern die Bewegung.
+
+  2. Step-Wizard (Step1 → Step2):
+     - Step2 ist initially hidden.
+     - Nach Klick auf "Weiter" prüft JS die Eingaben von Step1.
+     - Wenn gültig, wird Step1 hidden und Step2 sichtbar.
+
+  3. Autocomplete:
+     - JS hört auf Tastatureingaben in "from" und "to".
+     - Zeigt passende Haltestellen/Adressen im div mit id fromSuggestions/toSuggestions.
+     - Klick auf Vorschlag füllt das Input-Feld.
+
+  4. Fehleranzeigen:
+     - Leere oder ungültige Eingaben zeigen Text in fromError/toError.
+     - Wird dynamisch per JS angezeigt/entfernt.
+
+  5. Loader & Ergebnisse:
+     - Beim Absenden: loader sichtbar.
+     - JS ruft Fahrplandaten ab (z.B. SBB API).
+     - Ergebnisse als <li> in "connections" eingefügt.
+     - Nach Laden: loader hidden, results sichtbar.
+  -->
+
 </body>
 </html>
